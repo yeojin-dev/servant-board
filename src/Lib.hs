@@ -16,10 +16,11 @@ import           Servant
 import           ServantBoardData
 
 $(deriveJSON defaultOptions ''User)
+$(deriveJSON defaultOptions ''ServantBoardResult)
 
 type API =
   "users" :> Get '[JSON] [User]
-    :<|> "users" :> Post '[JSON] [User]
+    :<|> "users" :> Post '[JSON] ServantBoardResult
 
 startApp :: IO ()
 startApp = run 8080 app
@@ -33,4 +34,4 @@ api = Proxy
 server :: Server API
 server =
   return users
-    :<|> return users
+    :<|> return sampleResult

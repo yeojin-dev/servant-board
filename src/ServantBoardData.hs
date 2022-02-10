@@ -1,8 +1,18 @@
 module ServantBoardData
-  ( User,
+  ( ServantBoardResult,
+    sampleResult,
+    User,
     users,
   )
 where
+
+data ServantBoardResult = ServantBoardResult
+  { message :: String
+  }
+  deriving (Show)
+
+sampleResult :: ServantBoardResult
+sampleResult = ServantBoardResult "success"
 
 data User = User
   { userId        :: Int,
