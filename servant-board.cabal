@@ -25,6 +25,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      ServantBoardData
   other-modules:
       Paths_servant_board
   hs-source-dirs:
