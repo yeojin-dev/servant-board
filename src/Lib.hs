@@ -1,22 +1,25 @@
 {-# LANGUAGE DataKinds       #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators   #-}
-module Lib
-    ( startApp
-    , app
-    ) where
 
-import Data.Aeson
-import Data.Aeson.TH
-import Network.Wai
-import Network.Wai.Handler.Warp
-import Servant
-import ServantBoardData
+module Lib
+  ( startApp,
+    app,
+  )
+where
+
+import           Data.Aeson
+import           Data.Aeson.TH
+import           Network.Wai
+import           Network.Wai.Handler.Warp
+import           Servant
+import           ServantBoardData
 
 $(deriveJSON defaultOptions ''User)
 
-type API = "users" :> Get '[JSON] [User]
-  :<|> "users" :> Post '[JSON] [User]
+type API =
+  "users" :> Get '[JSON] [User]
+    :<|> "users" :> Post '[JSON] [User]
 
 startApp :: IO ()
 startApp = run 8080 app
@@ -28,5 +31,6 @@ api :: Proxy API
 api = Proxy
 
 server :: Server API
-server = return users
-  :<|> return users
+server =
+  return users
+    :<|> return users
