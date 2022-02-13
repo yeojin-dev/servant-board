@@ -6,6 +6,7 @@
 module Lib
   ( startApp,
     app,
+    initDB,
   )
 where
 
@@ -22,16 +23,13 @@ $(deriveJSON defaultOptions ''User)
 $(deriveJSON defaultOptions ''ServantBoardResult)
 
 initQuery :: Query
-initQuery = "CREATE TABLE IF NOT EXISTS post (id PRIMARY KEY, content text not null);"
+initQuery = "CREATE TABLE IF NOT EXISTS post (id integer PRIMARY KEY AUTOINCREMENT, content text not null);"
 
 initDB :: FilePath -> IO ()
 initDB dbFileName = withConnection dbFileName $ \conn ->
   execute_
     conn
     initQuery
-
---dbFileName :: FilePath
---dbFileName = "test.sqlite"
 
 type API =
   "users" :> Get '[JSON] [User]
