@@ -9,6 +9,7 @@ module Lib
   )
 where
 
+import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Aeson.TH
 import           Database.SQLite.Simple
@@ -34,7 +35,7 @@ initDB dbFileName = withConnection dbFileName $ \conn ->
 
 type API =
   "users" :> Get '[JSON] [User]
-    :<|> "users" :> Post '[JSON] ServantBoardResult
+    :<|> "users" :> Post '[JSON] NoContent
 
 startApp :: FilePath -> IO ()
 startApp dbFileName = run 8080 (app dbFileName)
@@ -45,7 +46,14 @@ app dbFileName = serve api $ server dbFileName
 api :: Proxy API
 api = Proxy
 
+sampleQuery = "INSERT INTO post (content) VALUES ('test content');" :: Query
+
 server :: FilePath -> Server API
 server dbFileName =
   return users
-    :<|> return sampleResult
+    :<|> samplePost
+  where
+    samplePost :: Handler NoContent
+    samplePost = do
+      liftIO . withConnection dbFileName $ \conn -> execute_ conn sampleQuery
+      return NoContent
