@@ -24,6 +24,7 @@ dependencies:
 - servant-server
 - wai
 - warp
+- sqlite-simple
 
 library:
   source-dirs: src

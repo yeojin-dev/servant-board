@@ -11,7 +11,7 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = with (return app) $ do
+spec = with (return (app "test.sqlite")) $ do
     describe "GET /users" $ do
         it "responds with 200" $ do
             get "/users" `shouldRespondWith` 200
