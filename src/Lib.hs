@@ -19,8 +19,12 @@ import           Network.Wai.Handler.Warp
 import           Servant
 import           ServantBoardData
 
+newtype ContentWrapper = ContentWrapper {content :: String} deriving (Show, Eq)
+
+-- 타입을 JSON 오브젝트로 처리할 수 있도록 변환
 $(deriveJSON defaultOptions ''User)
 $(deriveJSON defaultOptions ''ServantBoardResult)
+$(deriveJSON defaultOptions ''ContentWrapper)
 
 initQuery :: Query
 initQuery = "CREATE TABLE IF NOT EXISTS post (id integer PRIMARY KEY AUTOINCREMENT, content text not null);"
@@ -33,7 +37,7 @@ initDB dbFileName = withConnection dbFileName $ \conn ->
 
 type API =
   "users" :> Get '[JSON] [User]
-    :<|> "users" :> Post '[JSON] NoContent
+    :<|> "users" :> ReqBody '[JSON] ContentWrapper :> Post '[JSON] NoContent
 
 startApp :: FilePath -> IO ()
 startApp dbFileName = run 8080 (app dbFileName)
@@ -44,14 +48,14 @@ app dbFileName = serve api $ server dbFileName
 api :: Proxy API
 api = Proxy
 
-sampleQuery = "INSERT INTO post (content) VALUES ('test content');" :: Query
+sampleQuery = "INSERT INTO post (content) VALUES (?);" :: Query
 
 server :: FilePath -> Server API
 server dbFileName =
   return users
     :<|> samplePost
   where
-    samplePost :: Handler NoContent
-    samplePost = do
-      liftIO . withConnection dbFileName $ \conn -> execute_ conn sampleQuery
+    samplePost :: ContentWrapper -> Handler NoContent
+    samplePost contentWrapper = do
+      liftIO . withConnection dbFileName $ \conn -> execute conn sampleQuery (Only (content contentWrapper))
       return NoContent
